@@ -19,39 +19,39 @@ class ServiceTest {
     lateinit var service: Service
 
     @Test
-    fun retryableMethod_callFromExternal_success() {
-        `when`(service.mayThrowExceptionForMock())
+    fun retryableMethod_success_whenCalledFromOtherObject() {
+        `when`(service.mayThrowException())
             .thenThrow(PersistFailed)
             .thenThrow(PersistFailed)
             .thenReturn("success")
 
-        service.mayThrowException()
+        service.retryableMethod()
 
+        verify(service, times(3)).retryableMethod()
         verify(service, times(3)).mayThrowException()
-        verify(service, times(3)).mayThrowExceptionForMock()
     }
 
     @Test
-    fun retryableMethod_callFromExternal_canRetryUntilMaxAttempts() {
-        `when`(service.mayThrowExceptionForMock()).thenThrow(PersistFailed)
+    fun retryableMethod_canRetryUntilMaxAttempts_whenCalledFromOtherObject() {
+        `when`(service.mayThrowException()).thenThrow(PersistFailed)
 
         assertFailsWith(PersistFailed::class) {
-            service.mayThrowException()
+            service.retryableMethod()
         }
 
-        verify(service, times(3)).mayThrowException()
+        verify(service, times(3)).retryableMethod()
     }
 
     @Test
-    fun retryableMethod_callFromInternal_canNotRetryThenThrowException() {
-        `when`(service.mayThrowExceptionForMock()).thenThrow(PersistFailed)
+    fun retryableMethod_canNotRetryThenThrowException_whenCalledFromSameObject() {
+        `when`(service.mayThrowException()).thenThrow(PersistFailed)
 
         assertFailsWith(PersistFailed::class) {
             service.callThrowableMethodInternal()
         }
 
+        verify(service, times(1)).retryableMethod()
         verify(service, times(1)).mayThrowException()
-        verify(service, times(1)).mayThrowExceptionForMock()
     }
 
 }

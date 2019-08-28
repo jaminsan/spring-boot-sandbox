@@ -6,18 +6,18 @@ import org.springframework.retry.annotation.Retryable
 open class Service {
 
     open fun callThrowableMethodInternal(): String {
-        mayThrowException()
+        retryableMethod()
         return "success"
     }
 
     @Retryable(BaseException::class, maxAttempts = 3, backoff = Backoff(delay = 1000, maxDelay = 10000))
-    open fun mayThrowException(): String {
-        mayThrowExceptionForMock()
+    open fun retryableMethod(): String {
+        mayThrowException()
         return "success"
     }
 
     // spring が作る proxy クラスを spy してしまわないようにこいつに例外を吐かせる
-    open fun mayThrowExceptionForMock(): String {
+    open fun mayThrowException(): String {
         return "success"
     }
 
