@@ -5,7 +5,7 @@ import org.springframework.retry.annotation.Retryable
 
 open class Service {
 
-    open fun callThrowableMethodInternal(): String {
+    open fun callRetryableMethod(): String {
         retryableMethod()
         return "success"
     }

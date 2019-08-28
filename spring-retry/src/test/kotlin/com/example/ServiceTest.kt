@@ -47,7 +47,7 @@ class ServiceTest {
         `when`(service.mayThrowException()).thenThrow(PersistFailed)
 
         assertFailsWith(PersistFailed::class) {
-            service.callThrowableMethodInternal()
+            service.callRetryableMethod()
         }
 
         verify(service, times(1)).retryableMethod()
