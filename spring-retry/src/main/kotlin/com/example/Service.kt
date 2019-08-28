@@ -5,26 +5,28 @@ import org.springframework.retry.annotation.Retryable
 
 open class Service {
 
+    @Throws(BaseException::class)
     open fun callRetryableMethod(): String {
-        retryableMethod()
+        retryable()
         return "success"
     }
 
     @Retryable(BaseException::class, maxAttempts = 3, backoff = Backoff(delay = 1000, maxDelay = 10000))
-    open fun retryableMethod(): String {
+    @Throws(BaseException::class)
+    open fun retryable(): String {
         mayThrowException()
         return "success"
     }
 
-    // spring が作る proxy クラスを spy してしまわないようにこいつに例外を吐かせる
+    // spring さんが作る proxy クラスを spy してしまわないようにこいつに例外を吐かせる
+    @Throws(BaseException::class)
     open fun mayThrowException(): String {
         return "success"
     }
 
-    // mockito で thenThrow するときに検査例外を投げられない？
-    sealed class BaseException(mesasge: String, cause: Throwable?) : RuntimeException() {
+    sealed class BaseException(message: String) : Exception(message) {
 
-        object PersistFailed : BaseException("persist failed", null)
+        object PersistFailed : BaseException("persist failed")
     }
 
 }

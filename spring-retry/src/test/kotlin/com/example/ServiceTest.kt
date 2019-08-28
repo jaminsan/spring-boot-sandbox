@@ -19,27 +19,27 @@ class ServiceTest {
     lateinit var service: Service
 
     @Test
-    fun retryableMethod_success_whenCalledFromOtherObject() {
+    fun retryableMethod_shouldBeSuccess_whenCalledFromOtherObject() {
         `when`(service.mayThrowException())
-            .thenThrow(PersistFailed)
-            .thenThrow(PersistFailed)
+            .thenAnswer { throw PersistFailed }
+            .thenAnswer { throw PersistFailed }
             .thenReturn("success")
 
-        service.retryableMethod()
+        service.retryable()
 
-        verify(service, times(3)).retryableMethod()
+        verify(service, times(3)).retryable()
         verify(service, times(3)).mayThrowException()
     }
 
     @Test
-    fun retryableMethod_canRetryUntilMaxAttempts_whenCalledFromOtherObject() {
-        `when`(service.mayThrowException()).thenThrow(PersistFailed)
+    fun retryableMethod_shouldRetryUntilMaxAttempts_whenCalledFromOtherObject() {
+        `when`(service.mayThrowException()).thenAnswer { throw PersistFailed }
 
         assertFailsWith(PersistFailed::class) {
-            service.retryableMethod()
+            service.retryable()
         }
 
-        verify(service, times(3)).retryableMethod()
+        verify(service, times(3)).retryable()
     }
 
     @Test
@@ -50,7 +50,7 @@ class ServiceTest {
             service.callRetryableMethod()
         }
 
-        verify(service, times(1)).retryableMethod()
+        verify(service, times(1)).retryable()
         verify(service, times(1)).mayThrowException()
     }
 
